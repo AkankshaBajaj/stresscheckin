@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Battery Check · Wellbeing@Mercell</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,700;9..144,800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #faf9ff;
+  --ink: #1e1450;
+  --accent: #6e5adc;
+  --accent2: #c4b5fd;
+  --purple: #6e5adc;
+  --green: #6e5adc;
+  --soft: #ffffff;
+  --border: #e2d9f3;
+  --muted: #9580e8;
+  --radius: 20px;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 32px 16px 60px;
+}
+
+/* ── SCREENS ── */
+.screen {
+  display: none;
+  width: 100%;
+  max-width: 400px;
+  flex-direction: column;
+  align-items: center;
+}
+.screen.active {
+  display: flex;
+  animation: popIn 0.4s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.94) translateY(12px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ── BRAND ── */
+.brand {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 32px;
+}
+
+/* ══════════════════════════════
+   SCREEN 0 — INTRO CARD
+══════════════════════════════ */
+#s0 { gap: 0; }
+
+.intro-card {
+  background: #1e1450;
+  border-radius: var(--radius);
+  padding: 36px 28px 32px;
+  text-align: center;
+  width: 100%;
+}
+.intro-emoji {
+  font-size: 52px;
+  display: block;
+  margin-bottom: 18px;
+  animation: float 3s ease-in-out infinite;
+}
+@keyframes float {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}
+.intro-title {
+  font-family: "Fraunces", serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.2;
+  margin-bottom: 14px;
+}
+.intro-title span { color: var(--accent2); }
+.intro-body {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.6);
+  line-height: 1.65;
+  margin-bottom: 28px;
+}
+.anon-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 50px;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.75);
+  margin-bottom: 28px;
+}
+.anon-pill .dot-lock { font-size: 14px; }
+
+.start-btn {
+  width: 100%;
+  background: #6e5adc;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 16px;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 4px 0 #4c3ab0;
+}
+.start-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #4c3ab0; }
+.start-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #4c3ab0; }
+
+/* ══════════════════════════════
+   SCREEN 1 — BATTERY QUIZ
+══════════════════════════════ */
+#s1 { gap: 0; }
+
+/* Battery */
+.bat-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  margin-bottom: 28px;
+  padding: 18px 20px;
+  background: var(--soft);
+  border-radius: var(--radius);
+  border: 1.5px solid var(--border);
+}
+.bat-icon { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; }
+.bat-tip {
+  width: 18px; height: 4px;
+  background: var(--ink);
+  border-radius: 2px 2px 0 0;
+  opacity: 0.3;
+}
+.bat-shell {
+  width: 40px; height: 80px;
+  border: 2.5px solid var(--ink);
+  border-radius: 7px;
+  background: var(--bg);
+  overflow: hidden;
+  position: relative;
+}
+.bat-fill {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: var(--green);
+  border-radius: 0 0 4px 4px;
+  height: 50%;
+  transition: height 0.7s cubic-bezier(.4,0,.2,1), background 0.5s;
+}
+.bat-info { flex: 1; }
+.bat-pct {
+  font-family: "Fraunces", serif;
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--ink);
+  line-height: 1;
+}
+.bat-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* Dots */
+.dots {
+  display: flex;
+  gap: 7px;
+  width: 100%;
+  margin-bottom: 20px;
+}
+.dot {
+  height: 4px;
+  flex: 1;
+  border-radius: 2px;
+  background: var(--border);
+  transition: background 0.3s, transform 0.2s;
+}
+.dot.on { background: var(--accent); }
+.dot.done { background: var(--purple); }
+
+/* Question card */
+.q-card {
+  background: var(--soft);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px 20px;
+  width: 100%;
+}
+.q-num {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.q-text {
+  font-family: "Fraunces", serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.35;
+  margin-bottom: 18px;
+}
+.opts { display: flex; flex-direction: column; gap: 8px; }
+.opt {
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 15px;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+  position: relative;
+}
+.opt:hover:not(:disabled) {
+  border-color: var(--purple);
+  background: #f0eeff;
+  transform: translateX(4px);
+}
+.opt.chosen-good {
+  background: var(--green);
+  border-color: var(--green);
+  color: white;
+}
+.opt.chosen-bad {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+.opt:disabled { cursor: default; opacity: 0.45; }
+.opt.chosen-good:disabled,
+.opt.chosen-bad:disabled { opacity: 1; }
+
+/* ══════════════════════════════
+   SCREEN 2 — DRUMROLL REVEAL
+══════════════════════════════ */
+#s2 {
+  justify-content: center;
+  min-height: 70vh;
+  gap: 20px;
+  text-align: center;
+}
+
+.reveal-stage { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+
+/* Drumroll phase */
+#drumroll-phase { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+
+.drum-emoji {
+  font-size: 64px;
+  animation: shake 0.15s infinite;
+  display: block;
+}
+@keyframes shake {
+  0%,100% { transform: rotate(-6deg); }
+  50%      { transform: rotate(6deg); }
+}
+.drum-text {
+  font-family: "Fraunces", serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+/* Countdown */
+#countdown-phase { display: none; flex-direction: column; align-items: center; }
+.countdown-num {
+  font-family: "Fraunces", serif;
+  font-size: 120px;
+  font-weight: 800;
+  color: var(--ink);
+  line-height: 1;
+  animation: countPop 0.5s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes countPop {
+  from { transform: scale(0.3); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+/* Big reveal */
+#reveal-phase { display: none; flex-direction: column; align-items: center; gap: 20px; width: 100%; }
+
+.result-card {
+  background: #1e1450;
+  border-radius: var(--radius);
+  padding: 28px 24px;
+  width: 100%;
+  text-align: center;
+  animation: popIn 0.5s cubic-bezier(.34,1.56,.64,1) both;
+}
+.result-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 8px;
+}
+.result-big {
+  font-family: "Fraunces", serif;
+  font-size: 80px;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 6px;
+  animation: numberDrop 0.6s cubic-bezier(.34,1.56,.64,1) 0.1s both;
+}
+@keyframes numberDrop {
+  from { transform: translateY(-30px) scale(0.7); opacity: 0; }
+  to   { transform: translateY(0) scale(1); opacity: 1; }
+}
+.result-sublabel {
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.55);
+}
+.confetti-row {
+  font-size: 28px;
+  letter-spacing: 4px;
+  animation: popIn 0.4s ease 0.5s both;
+}
+
+/* Peer bars */
+.peer-box {
+  background: var(--soft);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  width: 100%;
+  animation: popIn 0.4s ease 0.3s both;
+}
+.peer-title {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+.bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.bar-name { font-size: 12px; font-weight: 800; color: var(--ink); width: 48px; text-align: right; flex-shrink: 0; }
+.bar-track { flex: 1; height: 10px; background: var(--bg); border-radius: 50px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 50px; width: 0; transition: width 1.2s cubic-bezier(.4,0,.2,1); }
+.bar-fill.you { background: var(--purple); }
+.bar-fill.avg { background: #d0caf7; }
+.bar-pct { font-size: 12px; font-weight: 800; color: var(--ink); width: 34px; }
+.peer-verdict {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-top: 12px;
+  line-height: 1.55;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.next-btn {
+  width: 100%;
+  background: #6e5adc;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 16px;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #4c3ab0;
+  transition: transform 0.15s, box-shadow 0.15s;
+  animation: popIn 0.4s ease 0.6s both;
+}
+.next-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #4c3ab0; }
+.next-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #4c3ab0; }
+
+/* ══════════════════════════════
+   SCREEN 3 — REFLECTION
+══════════════════════════════ */
+#s3 { gap: 16px; }
+
+.s3-header {
+  width: 100%;
+  background: var(--soft);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+.s3-title {
+  font-family: "Fraunces", serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--ink);
+  margin-bottom: 5px;
+}
+.s3-sub {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  line-height: 1.55;
+}
+.lock-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #edf7ee;
+  border-radius: 50px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #2d7a36;
+  margin-top: 8px;
+}
+
+.r-block { width: 100%; display: flex; flex-direction: column; gap: 7px; }
+.r-label {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--ink);
+  padding-left: 4px;
+}
+.r-input {
+  width: 100%;
+  padding: 13px 15px;
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  resize: none;
+  min-height: 72px;
+  outline: none;
+  background: var(--soft);
+  line-height: 1.5;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.r-input:focus {
+  border-color: var(--purple);
+  box-shadow: 0 0 0 3px rgba(108,99,255,0.1);
+}
+.r-input::placeholder { color: #ccc9d8; font-weight: 600; }
+
+.shared-block {
+  width: 100%;
+  background: #ede9fe;
+  border: 1.5px solid #6e5adc;
+  border-radius: var(--radius);
+  padding: 16px;
+}
+.shared-label {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.shared-note {
+  font-size: 11px;
+  font-weight: 700;
+  color: #6e5adc;
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+.shared-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid #c4b5fd;
+  border-radius: 12px;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  resize: none;
+  min-height: 65px;
+  outline: none;
+  background: white;
+  line-height: 1.5;
+  transition: border-color 0.15s;
+}
+.shared-input:focus { border-color: #6e5adc; }
+.shared-input::placeholder { color: #c4b5fd; font-weight: 600; }
+
+.save-btn {
+  width: 100%;
+  background: #6e5adc;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 16px;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #4c3ab0;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.save-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #4c3ab0; }
+.save-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #4c3ab0; }
+.save-btn:disabled { background: var(--border); color: var(--muted); box-shadow: none; cursor: default; transform: none; }
+
+.err-msg { font-size: 12px; font-weight: 700; color: var(--accent); text-align: center; display: none; }
+
+/* ══════════════════════════════
+   DONE
+══════════════════════════════ */
+#done-screen {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  animation: popIn 0.5s cubic-bezier(.34,1.56,.64,1) both;
+}
+.done-card {
+  background: #1e1450;
+  border-radius: var(--radius);
+  padding: 36px 28px;
+  width: 100%;
+}
+.done-emoji { font-size: 48px; display: block; margin-bottom: 14px; }
+.done-title {
+  font-family: "Fraunces", serif;
+  font-size: 26px;
+  font-weight: 800;
+  color: white;
+  margin-bottom: 10px;
+}
+.done-msg {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.6);
+  line-height: 1.65;
+}
+
+/* Floating hearts */
+#hearts { position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 999; }
+.heart { position: absolute; font-size: 24px; animation: floatUp 1.8s ease-in forwards; }
+@keyframes floatUp {
+  0%   { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-80vh) scale(0.5); }
+}
+</style>
+</head>
+<body>
+<div id="hearts"></div>
+
+<!-- SCREEN 0: INTRO -->
+<div class="screen active" id="s0">
+  <p class="brand">Wellbeing @ Mercell</p>
+  <div class="intro-card">
+    <span class="intro-emoji">⚡</span>
+    <div class="intro-title">What's your<br><span>energy like today?</span></div>
+    <p class="intro-body">3 quick questions.<br>See how your energy compares to your peers.</p>
+    <div class="anon-pill"><span class="dot-lock">🔒</span> Your answers are recorded anonymously to compare with peers</div>
+    <button class="start-btn" onclick="startQuiz()">Let's find out →</button>
+  </div>
+</div>
+
+<!-- SCREEN 1: QUIZ -->
+<div class="screen" id="s1">
+  <p class="brand">Wellbeing @ Mercell</p>
+  <div class="bat-row">
+    <div class="bat-icon">
+      <div class="bat-tip"></div>
+      <div class="bat-shell"><div class="bat-fill" id="batFill"></div></div>
+    </div>
+    <div class="bat-info">
+      <div class="bat-pct" id="batPct">—</div>
+      <div class="bat-label" id="batLabel">Answer to charge</div>
+    </div>
+  </div>
+  <div class="dots" id="dots"></div>
+  <div id="qStage"></div>
+</div>
+
+<!-- SCREEN 2: DRUMROLL REVEAL -->
+<div class="screen" id="s2">
+  <div class="reveal-stage">
+
+    <!-- Phase A: drumroll -->
+    <div id="drumroll-phase">
+      <span class="drum-emoji">🥁</span>
+      <div class="drum-text">Drumroll please…</div>
+    </div>
+
+    <!-- Phase B: countdown -->
+    <div id="countdown-phase">
+      <div class="countdown-num" id="countNum">3</div>
+    </div>
+
+    <!-- Phase C: result -->
+    <div id="reveal-phase">
+      <div class="result-card">
+        <div class="result-label">Your battery level</div>
+        <div class="result-big" id="revealNum" style="color: var(--accent2)">0%</div>
+        <div class="result-sublabel" id="revealLabel"></div>
+      </div>
+      <div class="confetti-row" id="confettiRow"></div>
+      <div class="peer-box" id="peerBox" style="display:none">
+        <div class="peer-title">👥 How you compare</div>
+        <div class="bar-row">
+          <span class="bar-name">You</span>
+          <div class="bar-track"><div class="bar-fill you" id="barYou"></div></div>
+          <span class="bar-pct" id="barYouPct"></span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-name">Others</span>
+          <div class="bar-track"><div class="bar-fill avg" id="barAvg"></div></div>
+          <span class="bar-pct" id="barAvgPct"></span>
+        </div>
+        <div class="peer-verdict" id="peerVerdict"></div>
+      </div>
+      <div class="peer-box" id="noPeerBox" style="display:none">
+        <div class="peer-verdict" style="border:none; padding:0; margin:0">You're one of the first to check in — results will show once more people join. 🌱</div>
+      </div>
+      <button class="next-btn" onclick="goReflect()">Start my reflection →</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- SCREEN 3: REFLECTION -->
+<div class="screen" id="s3">
+  <p class="brand">Wellbeing @ Mercell</p>
+  <div class="s3-header">
+    <div class="s3-title">Your reflection</div>
+    <div class="s3-sub">Write honestly. This stays on your device.</div>
+    <div class="lock-badge">🔒 Private — not shared with anyone</div>
+  </div>
+
+  <div class="r-block">
+    <label class="r-label">My biggest workplace stressor right now is…</label>
+    <textarea class="r-input" id="q1" placeholder="tight deadlines, unclear expectations…"></textarea>
+  </div>
+  <div class="r-block">
+    <label class="r-label">I know I'm stressed when…</label>
+    <textarea class="r-input" id="q2" placeholder="I go quiet, lose sleep, feel tense…"></textarea>
+  </div>
+  <div class="r-block">
+    <label class="r-label">When overwhelmed I tend to…</label>
+    <textarea class="r-input" id="q3" placeholder="work longer hours, withdraw…"></textarea>
+  </div>
+  <div class="r-block">
+    <label class="r-label">One thing I want to do differently after today…</label>
+    <textarea class="r-input" id="q4" placeholder="take proper breaks, talk to my manager…"></textarea>
+  </div>
+
+  <div class="shared-block">
+    <div class="shared-label">My key takeaway from this training is…</div>
+    <div class="shared-note">📤 This one line only will be shared anonymously with Mercell.</div>
+    <textarea class="shared-input" id="qtakeaway" placeholder="I need to recognise my stress earlier…"></textarea>
+  </div>
+
+  <button class="save-btn" id="saveBtn" onclick="doSave()">Save my reflection as PDF 💜</button>
+  <p class="err-msg" id="errMsg">Please fill in all fields before saving.</p>
+</div>
+
+<!-- DONE -->
+<div id="done-screen">
+  <div class="done-card">
+    <span class="done-emoji">💜</span>
+    <div class="done-title">Reflection saved</div>
+    <p class="done-msg" id="doneMsg"></p>
+  </div>
+</div>
+
+<script>
+var SHEET = "https://script.google.com/macros/s/AKfycbyjN8mNabXXjmS8bdr6AWik-trHR46gsrDgIUJjWgmkkMc6j7lPZ6qWh31e3BcQXMNB/exec";
+
+var QS = [
+  { q: "How often do you genuinely switch off from work at the end of the day?", opts: [
+    { t: "Most days — I have a clear routine", s: 2 },
+    { t: "Sometimes — depends on the day", s: 1 },
+    { t: "Rarely — work follows me home", s: -1 },
+    { t: "Almost never", s: -2 }
+  ]},
+  { q: "How would you describe your energy levels right now?", opts: [
+    { t: "Good — focused and motivated", s: 2 },
+    { t: "Okay — some days better than others", s: 1 },
+    { t: "Low — tired most of the time", s: -1 },
+    { t: "Very low — running on empty", s: -2 }
+  ]},
+  { q: "How would you honestly rate your overall stress level right now?", opts: [
+    { t: "Low — calm and in control", s: 2 },
+    { t: "Moderate — manageable but noticeable", s: 1 },
+    { t: "High — affecting my daily life", s: -1 },
+    { t: "Very high — really struggling", s: -2 }
+  ]}
+];
+
+var G = { score: 0, idx: 0, pct: 0 };
+
+// ── AUDIO ENGINE ──
+var AudioCtx = window.AudioContext || window.webkitAudioContext;
+var ctx = null;
+function getCtx() {
+  if (!ctx) ctx = new AudioCtx();
+  return ctx;
+}
+
+function playChime() {
+  try {
+    var c = getCtx();
+    var play = function() {
+      var osc = c.createOscillator();
+      var gain = c.createGain();
+      osc.connect(gain); gain.connect(c.destination);
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(660, c.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(880, c.currentTime + 0.12);
+      gain.gain.setValueAtTime(0.18, c.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.35);
+      osc.start(c.currentTime); osc.stop(c.currentTime + 0.35);
+    };
+    if (c.state === "suspended") { c.resume().then(play); } else { play(); }
+  } catch(e) {}
+}
+
+function playDrumroll(duration, onDone) {
+  try {
+    var c = getCtx();
+    var beatInterval = 0.08;
+    var beats = Math.floor(duration / (beatInterval * 1000));
+    for (var i = 0; i < beats; i++) {
+      (function(i) {
+        var t = c.currentTime + i * beatInterval;
+        var buf = c.createBuffer(1, c.sampleRate * 0.04, c.sampleRate);
+        var data = buf.getChannelData(0);
+        for (var j = 0; j < data.length; j++) {
+          data[j] = (Math.random() * 2 - 1) * Math.exp(-j / (data.length * 0.3));
+        }
+        var src = c.createBufferSource();
+        var gain = c.createGain();
+        src.buffer = buf;
+        src.connect(gain); gain.connect(c.destination);
+        var speed = 1 + (i / beats) * 2.5;
+        gain.gain.setValueAtTime(0.12 + (i / beats) * 0.18, t);
+        src.playbackRate.value = speed;
+        src.start(t);
+      })(i);
+    }
+    setTimeout(onDone, duration);
+  } catch(e) { setTimeout(onDone, duration); }
+}
+
+function playRevealPop() {
+  try {
+    var c = getCtx();
+    [0, 0.08, 0.16].forEach(function(delay, i) {
+      var osc = c.createOscillator();
+      var gain = c.createGain();
+      osc.connect(gain); gain.connect(c.destination);
+      osc.type = "triangle";
+      var freq = [523, 659, 784][i];
+      osc.frequency.setValueAtTime(freq, c.currentTime + delay);
+      gain.gain.setValueAtTime(0.22, c.currentTime + delay);
+      gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + delay + 0.3);
+      osc.start(c.currentTime + delay);
+      osc.stop(c.currentTime + delay + 0.3);
+    });
+  } catch(e) {}
+}
+
+function playCountBeep(isLast) {
+  try {
+    var c = getCtx();
+    var osc = c.createOscillator();
+    var gain = c.createGain();
+    osc.connect(gain); gain.connect(c.destination);
+    osc.type = "sine";
+    osc.frequency.value = isLast ? 880 : 440;
+    gain.gain.setValueAtTime(isLast ? 0.3 : 0.15, c.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + (isLast ? 0.5 : 0.2));
+    osc.start(c.currentTime); osc.stop(c.currentTime + (isLast ? 0.5 : 0.2));
+  } catch(e) {}
+}
+
+// ── UTILS ──
+function getPct(s) { return Math.round(((s + 6) / 12) * 100); }
+function getCol(p) { return p >= 70 ? "#6e5adc" : p >= 40 ? "#9580e8" : p >= 20 ? "#c4b5fd" : "#6e5adc"; }
+function getLbl(p) { return p >= 70 ? "Well charged ⚡" : p >= 40 ? "Moderate 🔆" : p >= 20 ? "Running low 🪫" : "Needs charging 🔴"; }
+
+function updBat() {
+  var p = getPct(G.score); G.pct = p;
+  document.getElementById("batFill").style.height = p + "%";
+  document.getElementById("batFill").style.background = getCol(p);
+  if (G.idx > 0) {
+    document.getElementById("batPct").textContent = p + "%";
+    document.getElementById("batLabel").textContent = getLbl(p);
+  }
+}
+
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(function(s) { s.classList.remove("active"); });
+  var el = document.getElementById(id);
+  if (el) { el.classList.add("active"); }
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// ── DOTS ──
+function buildDots() {
+  var c = document.getElementById("dots"); c.innerHTML = "";
+  for (var i = 0; i < 3; i++) {
+    var d = document.createElement("div");
+    d.className = "dot" + (i === 0 ? " on" : ""); d.id = "dd" + i;
+    c.appendChild(d);
+  }
+}
+function updDots() {
+  for (var i = 0; i < 3; i++) {
+    var d = document.getElementById("dd" + i); if (!d) continue;
+    d.className = i < G.idx ? "dot done" : i === G.idx ? "dot on" : "dot";
+  }
+}
+
+// ── QUIZ ──
+function startQuiz() {
+  playChime();
+  showScreen("s1");
+  buildDots();
+  document.getElementById("batFill").style.height = "0%";
+  showQ(0);
+}
+
+function showQ(idx) {
+  var stage = document.getElementById("qStage"); stage.innerHTML = "";
+  var q = QS[idx];
+  var num = document.createElement("div"); num.className = "q-num";
+  num.textContent = "Question " + (idx + 1) + " of 3";
+  var qtxt = document.createElement("div"); qtxt.className = "q-text"; qtxt.textContent = q.q;
+  var opts = document.createElement("div"); opts.className = "opts";
+  q.opts.forEach(function(o) {
+    var btn = document.createElement("button"); btn.className = "opt"; btn.textContent = o.t;
+    btn.onclick = function() { pick(o.s, btn, opts); };
+    opts.appendChild(btn);
+  });
+  var card = document.createElement("div"); card.className = "q-card";
+  card.appendChild(num); card.appendChild(qtxt); card.appendChild(opts);
+  stage.appendChild(card);
+  updDots();
+}
+
+function pick(score, btn, opts) {
+  getCtx(); // unlock audio on first interaction
+  opts.querySelectorAll(".opt").forEach(function(b) { b.disabled = true; });
+  btn.className = score >= 1 ? "opt chosen-good" : "opt chosen-bad";
+  playChime(); // always play on every answer
+  G.score += score; updBat();
+  setTimeout(function() {
+    G.idx++;
+    if (G.idx < 3) { showQ(G.idx); }
+    else { setTimeout(startReveal, 400); }
+  }, 750);
+}
+
+// ── REVEAL SEQUENCE ──
+function startReveal() {
+  showScreen("s2");
+  fetchPeerAvg(G.pct);
+
+  // Show drumroll phase
+  document.getElementById("drumroll-phase").style.display = "flex";
+  document.getElementById("countdown-phase").style.display = "none";
+  document.getElementById("reveal-phase").style.display = "none";
+
+  playDrumroll(2000, function() { startCountdown(); });
+}
+
+function startCountdown() {
+  document.getElementById("drumroll-phase").style.display = "none";
+  document.getElementById("countdown-phase").style.display = "flex";
+  var nums = [3, 2, 1];
+  var i = 0;
+  function tick() {
+    if (i >= nums.length) { showReveal(); return; }
+    var el = document.getElementById("countNum");
+    el.textContent = nums[i];
+    el.style.animation = "none";
+    void el.offsetWidth;
+    el.style.animation = "countPop 0.5s cubic-bezier(.34,1.56,.64,1) both";
+    playCountBeep(nums[i] === 1);
+    i++;
+    setTimeout(tick, 900);
+  }
+  tick();
+}
+
+function showReveal() {
+  document.getElementById("countdown-phase").style.display = "none";
+  document.getElementById("reveal-phase").style.display = "flex";
+
+  var p = G.pct;
+  var el = document.getElementById("revealNum");
+  el.textContent = p + "%";
+  el.style.color = "#c4b5fd";
+  document.getElementById("revealLabel").textContent = getLbl(p);
+
+  // Save battery immediately
+  var batUrl = SHEET + "?action=saveBattery&battery=" + encodeURIComponent(p + "%");
+  var batImg = new Image(); batImg.src = batUrl;
+
+  // Confetti row
+  var row = document.getElementById("confettiRow");
+  row.textContent = p >= 70 ? "🎉 🌟 ⚡ 🌟 🎉" : p >= 40 ? "👏 💪 ✨ 💪 👏" : "💜 🤗 💜 🤗 💜";
+
+  playRevealPop();
+  burst();
+}
+
+// Peer data is fetched in parallel — show when ready
+var peerData = null;
+var peerFetched = false;
+function fetchPeerAvg(myPct) {
+  // Try fetch first (works in iframes), fall back to JSONP
+  fetch(SHEET + "?t=" + Date.now())
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (peerFetched) return;
+      peerFetched = true;
+      peerData = (d.result === "success" && d.avg !== null && d.total >= 2)
+        ? { avg: d.avg, total: d.total }
+        : null;
+      tryShowPeer(myPct);
+    })
+    .catch(function() {
+      if (peerFetched) return;
+      // fallback to JSONP
+      var cbName = "peerCb_" + Date.now();
+      window[cbName] = function(d) {
+        if (peerFetched) return;
+        peerFetched = true;
+        delete window[cbName];
+        var s = document.getElementById("peerScript"); if (s) s.remove();
+        peerData = (d.result === "success" && d.avg !== null && d.total >= 2)
+          ? { avg: d.avg, total: d.total }
+          : null;
+        tryShowPeer(myPct);
+      };
+      var s = document.createElement("script");
+      s.id = "peerScript";
+      s.src = SHEET + "?callback=" + cbName;
+      s.onerror = function() { 
+        if (!peerFetched) { peerFetched = true; peerData = null; tryShowPeer(myPct); }
+      };
+      document.body.appendChild(s);
+    });
+  // Final fallback
+  setTimeout(function() { 
+    if (!peerFetched) { peerFetched = true; peerData = null; tryShowPeer(myPct); }
+  }, 8000);
+}
+
+var revealShown = false;
+function tryShowPeer(myPct) {
+  // Always wait for reveal to be shown first
+  var check = setInterval(function() {
+    if (document.getElementById("reveal-phase").style.display !== "none") {
+      clearInterval(check);
+      applyPeer(myPct);
+    }
+  }, 200);
+}
+
+function applyPeer(myPct) {
+  if (peerData) {
+    document.getElementById("peerBox").style.display = "block";
+    document.getElementById("noPeerBox").style.display = "none";
+    document.getElementById("barYouPct").textContent = myPct + "%";
+    document.getElementById("barAvgPct").textContent = peerData.avg + "%";
+    setTimeout(function() {
+      document.getElementById("barYou").style.width = myPct + "%";
+      document.getElementById("barAvg").style.width = peerData.avg + "%";
+    }, 200);
+    var diff = myPct - peerData.avg;
+    document.getElementById("peerVerdict").textContent =
+      diff >= 15  ? "Your battery is well above the group — great work protecting your energy. 🌟" :
+      diff >= 5   ? "You're slightly above the group average. 👏" :
+      diff >= -5  ? "Your battery is right around the group average." :
+      diff >= -15 ? "Slightly below the group — be kind to yourself. 💜" :
+                    "Well below the group — you're not alone. Please reach out to someone you trust. 💜";
+  } else {
+    document.getElementById("peerBox").style.display = "none";
+    document.getElementById("noPeerBox").style.display = "block";
+  }
+}
+
+// ── REFLECT ──
+function goReflect() {
+  playChime();
+  showScreen("s3");
+}
+
+// ── SAVE ──
+function doSave() {
+  var vals = ["q1","q2","q3","q4","qtakeaway"].map(function(id) {
+    return document.getElementById(id).value.trim();
+  });
+  if (vals.some(function(v) { return !v; })) {
+    document.getElementById("errMsg").style.display = "block"; return;
+  }
+  document.getElementById("errMsg").style.display = "none";
+  var btn = document.getElementById("saveBtn");
+  btn.disabled = true; btn.textContent = "Opening PDF…";
+  // Use GET params — Apps Script handles this without CORS issues
+  var url = SHEET + "?action=saveReflection&takeaway=" + encodeURIComponent(vals[4]);
+  var img = new Image(); img.src = url;
+  makePDF(vals[0], vals[1], vals[2], vals[3]);
+  showDone();
+}
+
+function makePDF(q1, q2, q3, q4) {
+  var today = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+  var p = G.pct;
+  var bl = p >= 70 ? "Well charged" : p >= 40 ? "Moderate" : p >= 20 ? "Running low" : "Needs charging";
+  var s = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>My Stress Reflection</title>'
+    + '<style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:Georgia,serif;background:#fff;color:#1c1c2e;}'
+    + '.hdr{background:#1c1c2e;padding:32px 40px;}.brand{color:rgba(255,255,255,0.4);font-size:10px;letter-spacing:2px;text-transform:uppercase;font-family:Arial,sans-serif;margin-bottom:8px;}'
+    + '.hdr h1{color:#fff;font-size:22px;margin-bottom:4px;}.hdr p{color:rgba(255,255,255,0.45);font-size:11px;font-family:Arial,sans-serif;}'
+    + '.pill{display:inline-block;background:rgba(255,255,255,0.1);border-radius:50px;padding:5px 14px;color:#ffd93d;font-size:12px;font-weight:700;margin-top:10px;font-family:Arial,sans-serif;}'
+    + '.body{padding:28px 40px 80px;}.blk{margin-bottom:20px;}.lbl{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#6c63ff;font-family:Arial,sans-serif;margin-bottom:7px;}'
+    + '.ans{font-size:13px;color:#1c1c2e;line-height:1.7;padding:12px 16px;border-left:3px solid #e8e4dc;background:#fafafa;border-radius:0 8px 8px 0;}'
+    + 'hr{border:none;border-top:1px solid #f0edfb;margin:16px 0;}'
+    + '.ftr{position:fixed;bottom:0;width:100%;background:#f7f5f0;padding:12px 40px;font-size:10px;color:#9e9aa7;font-family:Arial,sans-serif;}'
+    + '@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}.notice{display:none!important;}}</style></head><body>'
+    + '<div class="notice" style="background:#f7f5f0;border:1px solid #e8e4dc;border-radius:10px;padding:14px 20px;margin:20px 40px;font-family:Arial,sans-serif;text-align:center;">'
+    + '<p style="font-size:13px;font-weight:700;color:#1c1c2e;margin-bottom:5px;">Your reflection is ready</p>'
+    + '<p style="font-size:11px;color:#9e9aa7;">Press <strong>Print</strong> and choose <strong>Save as PDF</strong>.</p></div>'
+    + '<div class="hdr"><div class="brand">Wellbeing @ Mercell</div><h1>My Stress Reflection</h1><p>' + today + '</p>'
+    + '<div class="pill">Battery: ' + p + '% — ' + bl + '</div></div>'
+    + '<div class="body">'
+    + '<div class="blk"><div class="lbl">My biggest workplace stressor right now is…</div><div class="ans">' + q1 + '</div></div><hr>'
+    + '<div class="blk"><div class="lbl">I know I\'m stressed when…</div><div class="ans">' + q2 + '</div></div><hr>'
+    + '<div class="blk"><div class="lbl">When overwhelmed I tend to…</div><div class="ans">' + q3 + '</div></div><hr>'
+    + '<div class="blk"><div class="lbl">One thing I want to do differently after today…</div><div class="ans">' + q4 + '</div></div>'
+    + '</div><div class="ftr">You took the time to reflect honestly. That takes courage. 💜</div>'
+    + '<scr' + 'ipt>window.onload=function(){window.print();}</' + 'script></body></html>';
+  var w = window.open("", "_blank");
+  if (w) { w.document.write(s); w.document.close(); }
+}
+
+function showDone() {
+  document.getElementById("s3").classList.remove("active");
+  var ds = document.getElementById("done-screen");
+  ds.style.display = "flex";
+  var p = G.pct;
+  document.getElementById("doneMsg").textContent =
+    p >= 70 ? "Your battery is in great shape. Keep protecting your energy. Your PDF is ready. 🌟" :
+    p >= 40 ? "Good awareness. Make one small change this week. Your PDF is ready." :
+    p >= 20 ? "Your battery needs attention. One small act of recovery today. Your PDF is ready. 💜" :
+              "It takes courage to be this honest. Please reach out to someone you trust. Your PDF is ready. 💜";
+  burst();
+}
+
+// ── CONFETTI BURST ──
+function burst() {
+  var c = document.getElementById("hearts");
+  var emojis = ["💜","⚡","✨","🌟","💛"];
+  for (var i = 0; i < 8; i++) {
+    (function(i) {
+      setTimeout(function() {
+        var el = document.createElement("span");
+        el.className = "heart";
+        el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        el.style.left = (5 + Math.random() * 90) + "%";
+        el.style.top = (20 + Math.random() * 60) + "%";
+        el.style.animationDuration = (1.2 + Math.random() * 0.8) + "s";
+        c.appendChild(el);
+        setTimeout(function() { el.remove(); }, 2200);
+      }, i * 100);
+    })(i);
+  }
+}
+</script>
+</body>
+</html>
